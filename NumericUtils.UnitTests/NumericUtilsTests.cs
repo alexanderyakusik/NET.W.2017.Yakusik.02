@@ -8,6 +8,42 @@ namespace NumericUtils.NUnitTests
     [TestFixture]
     public class NumericUtilsTests
     {
+        [TestCase(15, 15, 0, 0, 15)]
+        [TestCase(8, 15, 0, 0, 9)]
+        [TestCase(8, 15, 8, 3, 120)]
+        public void InsertNumber_CorrectValuesPassed_WorksCorrectly(int destinationNumber, int sourceNumber,
+                                                                    int highBitIndex, int lowBitIndex,
+                                                                    int expectedResult)
+        {
+            int actualResult = NumericUtils.InsertNumber(destinationNumber, sourceNumber, highBitIndex, lowBitIndex);
+
+            Assert.AreEqual(expectedResult, actualResult);
+        }
+
+        [TestCase(1, 2, -1, 0)]
+        [TestCase(123, 123, 5, -8)]
+        [TestCase(1421, 1241, 53, 5)]
+        [TestCase(12, 12, 2, 54)]
+        public void InsertNumber_IncorrectBitIndexPassed_ArgumentOutOfRangeExceptionThrown(int destinationNumber, 
+                                                                                           int sourceNumber,
+                                                                                           int highBitIndex,
+                                                                                           int lowBitIndex)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => NumericUtils.InsertNumber(destinationNumber, sourceNumber, highBitIndex, lowBitIndex));
+        }
+
+        [TestCase(1, 1, 3, 4)]
+        [TestCase(-142, -52, 30, 31)]
+        public void InsertNumber_HighBitIndexIsLessThanLowBitIndex_ArgumentExceptionThrown(int destinationNumber,
+                                                                                           int sourceNumber,
+                                                                                           int highBitIndex,
+                                                                                           int lowBitIndex)
+        {
+            Assert.Throws<ArgumentException>(
+                () => NumericUtils.InsertNumber(destinationNumber, sourceNumber, highBitIndex, lowBitIndex));
+        }
+
         [TestCase(12, 21)]
         [TestCase(513, 531)]
         [TestCase(2017, 2071)]
