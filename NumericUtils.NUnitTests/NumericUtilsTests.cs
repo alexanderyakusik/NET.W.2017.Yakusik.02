@@ -79,7 +79,7 @@ namespace NumericUtils.NUnitTests
         [TestCase(1)]
         [TestCase(123456789)]
         [TestCase(198765432)]
-        public void FindNextBiggerNumber_CorrectNumberPassed_ExecutionTimeIsCorrect(int initialNumber)
+        public void FindNextBiggerNumber_CorrectNumberPassed_ExecutionTimeIsApproximatelyCorrect(int initialNumber)
         {
             Stopwatch sw = new Stopwatch();
 
@@ -87,7 +87,7 @@ namespace NumericUtils.NUnitTests
             NumericUtils.FindNextBiggerNumber(initialNumber, out long actualMilliseconds);
             sw.Stop();
 
-            Assert.AreEqual(sw.ElapsedMilliseconds, actualMilliseconds);
+            Assert.That(sw.ElapsedMilliseconds, Is.InRange(actualMilliseconds, actualMilliseconds + 1));
         }
 
         [TestCase(new int[] { 213142, 234514, 234153, 892384 }, 0, new int[] { })]

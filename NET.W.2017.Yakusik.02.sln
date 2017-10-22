@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericUtils", "NumericUtils\NumericUtils.csproj", "{BAD385B3-8029-4B37-8C4D-12FE7B3D4B84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericUtils.NUnitTests", "NumericUtils.UnitTests\NumericUtils.NUnitTests.csproj", "{803428F8-B5CF-428E-8264-80C055259734}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericUtils.NUnitTests", "NumericUtils.NUnitTests\NumericUtils.NUnitTests.csproj", "{803428F8-B5CF-428E-8264-80C055259734}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericUtils.MSUnitTests", "NumericUtils.MSUnitTests\NumericUtils.MSUnitTests.csproj", "{4E028191-2365-4267-9F0C-CFC2B36DA6D1}"
 EndProject
