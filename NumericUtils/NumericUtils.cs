@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace NumericUtils
 {
@@ -12,11 +13,11 @@ namespace NumericUtils
         }
 
         /// <summary>
-        /// Finds the nearest number greater than the input <paramref name="number"/> parameter,
+        /// Finds the nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits.
         /// </summary>
         /// <param name="number">Input number</param>
-        /// <returns>Nearest number greater than the input <paramref name="number"/> parameter,
+        /// <returns>Nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="number"/> is non positive.</exception>
         /// <exception cref="OverflowException">Return value is not in the range of System.Int32 type.</exception>
@@ -52,12 +53,12 @@ namespace NumericUtils
         }
 
         /// <summary>
-        /// Finds the nearest number greater than the input <paramref name="number"/> parameter,
+        /// Finds the nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits.
         /// </summary>
         /// <param name="number">Input number</param>
         /// <param name="elapsedMilliseconds">Method time execution</param>
-        /// <returns>Nearest number greater than the input <paramref name="number"/> parameter,
+        /// <returns>Nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="number"/> is non positive.</exception>
         /// <exception cref="OverflowException">Return value is not in the range of System.Int32 type.</exception>
@@ -72,6 +73,84 @@ namespace NumericUtils
             elapsedMilliseconds = sw.ElapsedMilliseconds;
 
             return number;
+        }
+
+        /// <summary>
+        /// Returns list containing values from <paramref name="list"/> that have digit
+        /// specified by the <paramref name="filteringDigit"/>.
+        /// </summary>
+        /// <param name="list">List to be filtered</param>
+        /// <param name="filteringDigit">Digit to filter</param>
+        /// <returns>Filtered list</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="filteringDigit"/> 
+        /// is not in the range of 0 and 9</exception>
+        public static IList<int> FilterDigit(IList<int> list, int filteringDigit)
+        {
+            if (list == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (filteringDigit < 0 || filteringDigit > 9)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            var filteredList = new List<int>();
+
+            foreach (int item in list)
+            {
+                foreach (int digit in SplitNumberIntoDigits(item))
+                {
+                    if (digit == filteringDigit)
+                    {
+                        filteredList.Add(item);
+                        break;
+                    }
+                }
+            }
+
+            return filteredList;
+        }
+
+        /// <summary>
+        /// Finds a root of <paramref name="degree"/> of <paramref name="number"/> with the 
+        /// specified <paramref name="precision"/>.
+        /// </summary>
+        /// <param name="number">Initial number</param>
+        /// <param name="degree">Degree of root</param>
+        /// <param name="precision">Specified precision of the result</param>
+        /// <returns>Root of <paramref name="degree"/> of <paramref name="number"/> with the 
+        /// specified <paramref name="precision"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="degree"/> is non positive</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="precision"/> is incorrect</exception>
+        public static double FindNthRoot(double number, int degree, double precision)
+        {
+            ValidatePositiveNumber(degree);
+            ValidatePrecision(precision);
+
+            double next, current = 1;
+            while (true)
+            {
+                next = (1.0 / degree) * ((degree - 1) * current + number / Math.Pow(current, degree - 1));
+                if (Math.Abs(next - current) < precision)
+                {
+                    break;
+                }
+                current = next;
+            }
+
+            return next;
+        }
+
+        private static void ValidatePrecision(double precision)
+        {
+            string precisionString = string.Format("{0:0.##E+00}", precision);
+            if (!Regex.IsMatch(precisionString, @"^1E-[0-9]+"))
+            {
+                throw new ArgumentOutOfRangeException();
+            }
         }
 
         private static void ValidatePositiveNumber(int number)
@@ -122,16 +201,6 @@ namespace NumericUtils
             T temp = list[firstIndex];
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
-        }
-
-        public static void FilterDigit(IList<int> list, int digit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static double FindNthRoot(double number, int degree, double precision)
-        {
-            throw new NotImplementedException();
         }
     }
 }
