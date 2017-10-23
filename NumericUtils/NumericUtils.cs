@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -23,7 +22,7 @@ namespace NumericUtils
         /// <paramref name="lowBitIndex"/></exception>
         public static int InsertNumber(int destinationNumber, int sourceNumber, int highBitIndex, int lowBitIndex)
         {
-            if (highBitIndex < 0 || highBitIndex > 31 || lowBitIndex < 0 || lowBitIndex > 31)
+            if (highBitIndex < 0 || highBitIndex > INT_MAX_BIT_INDEX || lowBitIndex < 0 || lowBitIndex > INT_MAX_BIT_INDEX)
             {
                 throw new ArgumentOutOfRangeException();
             }
@@ -33,18 +32,14 @@ namespace NumericUtils
                 throw new ArgumentException();
             }
 
-            var destinationNumberBits = new BitArray(new int[] { destinationNumber });
-            var sourceNumberBits = new BitArray(new int[] { sourceNumber });
+            destinationNumber |= GetNumberBasedOnBitPosition(lowBitIndex, highBitIndex);
+            int numberBasedOnCopiedBits = sourceNumber & GetNumberBasedOnBitPosition(0, highBitIndex - lowBitIndex);
+            numberBasedOnCopiedBits <<= lowBitIndex;
+            numberBasedOnCopiedBits |= GetNumberBasedOnBitPosition(0, lowBitIndex - 1);
+            numberBasedOnCopiedBits |= GetNumberBasedOnBitPosition(highBitIndex + 1, INT_MAX_BIT_INDEX);
+            destinationNumber &= numberBasedOnCopiedBits;
 
-            for (int i = lowBitIndex; i <= highBitIndex; i++)
-            {
-                destinationNumberBits.Set(i, sourceNumberBits[i - lowBitIndex]);
-            }
-
-            int[] resultArray = new int[1];
-            destinationNumberBits.CopyTo(resultArray, 0);
-
-            return resultArray[0];
+            return destinationNumber;
         }
 
         /// <summary>
@@ -179,6 +174,29 @@ namespace NumericUtils
             return next;
         }
 
+        #region Private fields
+        private const int INT_MAX_BIT_INDEX = 31;
+        #endregion
+
+        #region Private methods
+
+        private static int RotateLeft(int number, int n)
+        {
+            return number << n | number >> (INT_MAX_BIT_INDEX - n);
+        }
+
+        private static int GetNumberBasedOnBitPosition(int lowBitPosition, int highBitPosition)
+        {
+            int result = 0;
+
+            for (int i = lowBitPosition; i <= highBitPosition; i++)
+            {
+                result |= 1 << i;
+            }
+
+            return result;
+        }
+
         private static void ValidatePrecision(double precision)
         {
             string precisionString = string.Format("{0:0.##E+00}", precision);
@@ -237,5 +255,7 @@ namespace NumericUtils
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
         }
+
+        #endregion
     }
 }
