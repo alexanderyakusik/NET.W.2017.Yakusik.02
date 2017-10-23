@@ -22,6 +22,8 @@ namespace NumericUtils
         /// <paramref name="lowBitIndex"/></exception>
         public static int InsertNumber(int destinationNumber, int sourceNumber, int highBitIndex, int lowBitIndex)
         {
+            const int INT_MAX_BIT_INDEX = 31;
+
             if (highBitIndex < 0 || highBitIndex > INT_MAX_BIT_INDEX || lowBitIndex < 0 || lowBitIndex > INT_MAX_BIT_INDEX)
             {
                 throw new ArgumentOutOfRangeException();
@@ -174,16 +176,7 @@ namespace NumericUtils
             return next;
         }
 
-        #region Private fields
-        private const int INT_MAX_BIT_INDEX = 31;
-        #endregion
-
         #region Private methods
-
-        private static int RotateLeft(int number, int n)
-        {
-            return number << n | number >> (INT_MAX_BIT_INDEX - n);
-        }
 
         private static int GetNumberBasedOnBitPosition(int lowBitPosition, int highBitPosition)
         {
