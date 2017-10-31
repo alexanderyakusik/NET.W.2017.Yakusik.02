@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace NumericUtils
 {
@@ -52,33 +51,27 @@ namespace NumericUtils
         /// <returns>Nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits or -1 if there isn't one</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="number"/> is non positive</exception>
-        /// <exception cref="OverflowException">Return value is not in the range of System.Int32 type</exception>
         public static int FindNextBiggerNumber(int number)
         {
             ValidatePositiveNumber(number);
 
-            if (number < 10)
-            {
-                return -1;
-            }
-
-            List<int> digits = SplitNumberIntoDigits(number);
+            int[] digits = SplitNumberIntoDigits(number);
 
             FindFirstDigitGreaterThanTheNext(digits, out int currentIndex);
 
-            if (currentIndex + 1 == digits.Count)
+            if (currentIndex + 1 == digits.Length)
             {
                 return -1;
             }
 
-            digits.Swap(currentIndex, currentIndex + 1);
-            digits.Sort(0, currentIndex + 1, Comparer<int>.Create((x, y) => x < y ? 1 : (x == y ? 0 : -1)));
-            digits.Reverse();
+            Swap(ref digits[currentIndex], ref digits[currentIndex + 1]);
+            Array.Sort(digits, 0, currentIndex + 1, Comparer<int>.Create((x, y) => x < y ? 1 : (x == y ? 0 : -1)));
+            Array.Reverse(digits);
 
             int result = GetNumberFromDigits(digits);
             if (result <= 0)
             {
-                throw new OverflowException();
+                return -1;
             }
 
             return result;
@@ -93,7 +86,6 @@ namespace NumericUtils
         /// <returns>Nearest number greater than the input <paramref name="number"/>,
         /// consisting of the same digits or -1 if there isn't one</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="number"/> is non positive</exception>
-        /// <exception cref="OverflowException">Return value is not in the range of System.Int32 type</exception>
         public static int FindNextBiggerNumber(int number, out long elapsedMilliseconds)
         {
             Stopwatch sw = new Stopwatch();
@@ -108,38 +100,29 @@ namespace NumericUtils
         }
 
         /// <summary>
-        /// Returns list containing values from <paramref name="list"/> that have digit
-        /// specified by the <paramref name="filteringDigit"/>
+        /// Returns list containing values from <paramref name="list"/> that match
+        /// the <paramref name="predicate"/>
         /// </summary>
         /// <param name="list">List to be filtered</param>
-        /// <param name="filteringDigit">Digit to filter</param>
+        /// <param name="predicate">Predicate to filter</param>
         /// <returns>Filtered list</returns>
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="filteringDigit"/> 
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is null</exception>
         /// is not in the range of 0..9</exception>
-        public static IList<int> FilterDigit(IList<int> list, int filteringDigit)
+        public static List<int> FilterDigit(IEnumerable<int> list, IPredicate<int> predicate)
         {
-            if (list == null)
+            if (list == null || predicate == null)
             {
                 throw new ArgumentNullException();
-            }
-
-            if (filteringDigit < 0 || filteringDigit > 9)
-            {
-                throw new ArgumentOutOfRangeException();
             }
 
             var filteredList = new List<int>();
 
             foreach (int item in list)
             {
-                foreach (int digit in SplitNumberIntoDigits(item))
+                if (predicate.IsTrue(item))
                 {
-                    if (digit == filteringDigit)
-                    {
-                        filteredList.Add(item);
-                        break;
-                    }
+                    filteredList.Add(item);
                 }
             }
 
@@ -192,8 +175,7 @@ namespace NumericUtils
 
         private static void ValidatePrecision(double precision)
         {
-            string precisionString = string.Format("{0:0.##E+00}", precision);
-            if (!Regex.IsMatch(precisionString, @"^1E-[0-9]+"))
+            if (precision < 0 || precision > 1)
             {
                 throw new ArgumentOutOfRangeException();
             }
@@ -216,13 +198,14 @@ namespace NumericUtils
             }
         }
 
-        private static List<int> SplitNumberIntoDigits(int number)
+        private static int[] SplitNumberIntoDigits(int number)
         {
-            List<int> digits = new List<int>();
+            int[] digits = new int[number.ToString().Length];
+            int count = 0;
 
             while (number > 0)
             {
-                digits.Add(number % 10);
+                digits[count++] = (number % 10);
                 number /= 10;
             }
 
@@ -242,11 +225,11 @@ namespace NumericUtils
             return number;
         }
 
-        private static void Swap<T>(this List<T> list, int firstIndex, int secondIndex)
+        private static void Swap(ref int first, ref int second)
         {
-            T temp = list[firstIndex];
-            list[firstIndex] = list[secondIndex];
-            list[secondIndex] = temp;
+            int temp = first;
+            first = second;
+            second = temp;
         }
 
         #endregion

@@ -71,9 +71,12 @@ namespace NumericUtils.NUnitTests
 
         [TestCase(Int32.MaxValue)]
         [TestCase(1333333332)]
-        public void FindNextBiggerNumber_ReturnNumberIsBiggerThanHighestInteger_OverflowExceptionThrown(int initialNumber)
+        public void FindNextBiggerNumber_ReturnNumberIsBiggerThanHighestInteger_MinusOneReturned(int initialNumber)
         {
-            Assert.Throws<OverflowException>(() => NumericUtils.FindNextBiggerNumber(initialNumber));
+            int actual = NumericUtils.FindNextBiggerNumber(initialNumber);
+            int expected = -1;
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase(1)]
@@ -94,25 +97,14 @@ namespace NumericUtils.NUnitTests
         [TestCase(new int[] { 3, 33, 333, 3333, 33333 }, 3, new int[] { 3, 33, 333, 3333, 33333 })]
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 68, 69, 70, 15, 17 }, 7, new int[] { 7, 70, 17 })]
         [TestCase(new int[] { }, 5, new int[] { })]
-        public void FilterDigit_CorrectValuesPassed_WorksCorrectly(IList<int> initialList, int digit, IList<int> expectedList)
+        public void FilterDigit_CorrectValuesPassed_WorksCorrectly(IList<int> initialList, int soughtDigit,
+                                                                   IList<int> expectedList)
         {
-            IList<int> actualList = NumericUtils.FilterDigit(initialList, digit);
+            IPredicate<int> predicate = new DigitInNumberPredicate(soughtDigit);
+
+            IList<int> actualList = NumericUtils.FilterDigit(initialList, predicate);
 
             CollectionAssert.AreEqual(expectedList, actualList);
-        }
-
-        [TestCase(null, -1)]
-        [TestCase(null, 9)]
-        public void FilterDigit_NullArgumentPassed_ArgumentNullExceptionThrown(IList<int> initialList, int digit)
-        {
-            Assert.Throws<ArgumentNullException>(() => NumericUtils.FilterDigit(initialList, digit));
-        }
-
-        [TestCase(new int[] { }, -2)]
-        [TestCase(new int[] { }, 10)]
-        public void FilterDigit_IncorrectDigitPassed_ArgumentOutOfRangeExceptionThrown(IList<int> initialList, int digit)
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(() => NumericUtils.FilterDigit(initialList, digit));
         }
 
         [TestCase(1, 5, 0.0001, 1)]
